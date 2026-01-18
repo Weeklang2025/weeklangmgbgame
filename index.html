@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @font-face {
+            font-family: 'SuperMario';
+            src: url('fonts/SuperMario256.ttf') format('truetype');
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #FCF2D8;
+        }
+        #mainScreen, #howToPlayModal, #gameOverModal, #gameCanvas {
+            font-family: 'SuperMario', sans-serif;
+        }
+        #mainScreen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1200px;
+            height: 800px;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #menuImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        #mainScreen h1 {
+            font-size: 84px;
+            color: #6c03f5d7;
+            text-shadow: 
+                -2px -2px 0 #000,  
+                2px -2px 0 #000,  
+                -2px  2px 0 #000,  
+                2px  2px 0 #000;
+            margin: 10px;
+        }
+        #mainScreenLastScore {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px 40px;
+            border: 4px solid #59E09D;
+            border-radius: 10px;
+        }
+        #mainScreenLastScore span {
+            color: #FFD700;
+        }
+        #startPrompt {
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+            margin: 20px 0;
+        }
+        #howToPlayBtn {
+            font-size: 24px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border: 3px solid #000000;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        #howToPlayBtn:hover {
+            background-color: rgba(255, 105, 180, 0.3);
+            transform: scale(1.05);
+        }
+        #howToPlayModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        #howToPlayModal .modal-content {
+            background: rgba(20, 20, 40, 0.95);
+            padding: 40px 60px;
+            border: 6px solid #59E09D;
+            border-radius: 15px;
+            max-width: 700px;
+            text-align: center;
+        }
+        #howToPlayModal h2 {
+            color: #59E09D;
+            font-size: 48px;
+            margin: 0 0 30px 0;
+            text-shadow: 2px 2px 4px black;
+        }
+        #howToPlayModal p {
+            color: white;
+            font-size: 28px;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        #howToPlayModal button {
+            font-size: 28px;
+            color: white;
+            background-color: rgba(255, 105, 180, 0.5);
+            padding: 15px 40px;
+            border: 3px solid #59E09D;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        #howToPlayModal button:hover {
+            background-color: rgba(67, 209, 142, 0.8);
+            transform: scale(1.05);
+        }
+        #gameOverModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            color: black;
+            font-size: 20px;
+            z-index: 10;
+        }
+        #gameOverModal p {
+            color: black;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+        }
+        #gameOverModal span {
+            color: #ff4500;
+        }
+        #gameOverModal button {
+            font-size: 20px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+        #gameCanvas {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1200px;
+            height: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainScreen">
+        <img src="images/menu_background.jpg" alt="Menu Background" id="menuImage">
+        <h1>MagicBlock Smasher</h1>
+        <p id="startPrompt">Press any key to start</p>
+        <button id="howToPlayBtn">How to Play</button>
+        <p id="mainScreenLastScore">Last Score: <span id="mainLastScore">0</span></p>
+    </div>
+    <div class="social-links">
+        <h3 class="goats-title">LEGENDS</h3>
+        <a href="https://x.com/magicblock" target="_blank" class="social-link">
+            <img src="images/magicblock.jpg" alt="Twitter 1">
+        </a>
+        <a href="https://x.com/supermarioblock" target="_blank" class="social-link">
+            <img src="images/andrea.jpg" alt="Twitter 2">
+        </a>
+        <a href="https://x.com/16vivz" target="_blank" class="social-link">
+            <img src="images/viv.jpg" alt="Twitter 3">
+        </a>
+        <a href="https://x.com/MagicIntern" target="_blank" class="social-link">
+            <img src="images/wizardio.webp" alt="Twitter 4">
+        </a>
+        <a href="https://x.com/solana" target="_blank" class="social-link">
+            <img src="images/solana.jpg" alt="Twitter 5">
+        </a>
+        <a href="https://twitter.com/Yurii_week" target="_blank" class="social-link">
+            <img src="images/weeklang.png" alt="Twitter 6">
+        </a>
+    </div>
+    <div class="social-links-right">
+        <h3 class="frens-title">FRENS</h3>
+        <a href="https://x.com/dakehnyy" target="_blank" class="social-link">
+            <img src="images/dakehnyy.jpg" alt="Twitter 1">
+        </a>
+        <a href="https://x.com/simpletox26" target="_blank" class="social-link">
+            <img src="images/simpletox.jpg" alt="Twitter 2">
+        </a>
+        <a href="https://x.com/m4lkxx" target="_blank" class="social-link">
+            <img src="images/m4lka.jpg" alt="Twitter 3">
+        </a>
+        <a href="https://x.com/M_a_d_a_r_aa" target="_blank" class="social-link">
+            <img src="images/madara.jpg" alt="Twitter 4">
+        </a>
+        <a href="https://x.com/StanovAndrew" target="_blank" class="social-link">
+            <img src="images/mersault.jpg" alt="Twitter 5">
+        </a>
+        <a href="https://x.com/0xCryptoViktor_" target="_blank" class="social-link">
+            <img src="images/viktor.png" alt="Twitter 6">
+        </a>
+    </div>
+    <canvas id="gameCanvas" width="1200" height="800"></canvas>
+    <div id="howToPlayModal">
+        <div class="modal-content">
+            <h2>How to Play</h2>
+            <p>Use A/D or Arrow Keys to move</p>
+            <p>Press Space to jump</p>
+            <p>Jump on Latency, Fees, and Privacy to earn points!</p>
+            <p>Watch out for Vivz, who drops Eggdrea on you!</p>
+            <button id="closeModalBtn">Close</button>
+        </div>
+    </div>
+    <div id="gameOverModal">
+        <p>Game Over! Score: <span id="finalScore"></span></p>
+        <p>Last Score: <span id="lastScore">0</span></p>
+        <button id="restartBtn">Restart</button>
+    </div>
+    
+    <!-- Аудио элементы с правильным preload -->
+    <audio id="mainMenuMusic" loop preload="auto">
+        <source src="mainMenuMusic.mp3" type="audio/mpeg">
+        <source src="mainMenuMusic.ogg" type="audio/ogg">
+    </audio>
+    <audio id="backgroundMusic" loop preload="auto">
+        <source src="background_music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="deathSound" preload="auto">
+        <source src="death_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="jumpSound" preload="auto">
+        <source src="jump_sound.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script src="game.js"></script>
+</body>
+</html>
